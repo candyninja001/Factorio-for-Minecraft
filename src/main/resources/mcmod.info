@@ -1,0 +1,16 @@
+[
+{
+  "modid": "factorio",
+  "name": "Factorio for Minecraft",
+  "description": "The automation from Factorio in Minecraft.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["CandyNinja_"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
