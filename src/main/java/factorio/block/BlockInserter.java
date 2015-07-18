@@ -1,4 +1,6 @@
+
 package factorio.block;
+
 
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
@@ -13,6 +15,7 @@ import java.util.Random;
 import factorio.Factorio;
 import factorio.tileentity.TileEntityInserter;
 
+
 public class BlockInserter extends Block implements ITileEntityProvider
 {
 	public BlockInserter()
@@ -24,14 +27,14 @@ public class BlockInserter extends Block implements ITileEntityProvider
 		setHardness( 3.0F );
 		setResistance( 5.0F );
 		setHarvestLevel( "pickaxe", 0 );
-		setLightOpacity(0);
+		setLightOpacity( 0 );
 	}
-	
+
 	public boolean isOpaqueCube()
-    {
-        return false;
-    }
-	
+	{
+		return false;
+	}
+
 	@Override
 	public TileEntity createNewTileEntity( World p_149915_1_, int p_149915_2_ )
 	{

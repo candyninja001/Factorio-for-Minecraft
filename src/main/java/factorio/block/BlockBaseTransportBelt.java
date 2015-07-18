@@ -1,5 +1,9 @@
+
 package factorio.block;
 
+
+import java.util.List;
+import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPistonBase;
 import net.minecraft.block.ITileEntityProvider;
@@ -18,10 +22,6 @@ import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.relauncher.Side;
-
-import java.util.List;
-import java.util.Random;
-
 import cpw.mods.fml.relauncher.SideOnly;
 import factorio.Factorio;
 import factorio.client.renderer.RenderTransportBelt;
@@ -29,10 +29,11 @@ import factorio.entity.EntityBeltItem;
 import factorio.tileentity.TileEntityInserter;
 import factorio.tileentity.TileEntityTransportBelt;
 
+
 public class BlockBaseTransportBelt extends Block
 {
 	public float speed = 0.0625f;
-	
+
 	public BlockBaseTransportBelt( float moveSpeed )
 	{
 		super( Material.circuits );
@@ -46,50 +47,50 @@ public class BlockBaseTransportBelt extends Block
 		setBlockBounds( 0.0f, 0.0f, 0.0f, 1.0f, 0.0625f, 1.0f );
 		setLightOpacity( 0 );
 	}
-	
+
 	public boolean isOpaqueCube()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public boolean renderAsNormalBlock()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public int getRenderType()
 	{
 		return RenderTransportBelt.renderID;
 	}
-	
+
 	protected void checkAndDropBlock( World world, int x, int y, int z )
 	{
-		if ( !this.canBlockStay( world, x, y, z ) )
+		if( !this.canBlockStay( world, x, y, z ) )
 		{
 			this.dropBlockAsItem( world, x, y, z, world.getBlockMetadata( x, y, z ), 0 );
 			world.setBlock( x, y, z, getBlockById( 0 ), 0, 2 );
 		}
 	}
-	
+
 	public boolean canBlockStay( World world, int x, int y, int z )
 	{
 		return world.getBlock( x, y - 1, z ).isSideSolid( world, x, y, z, ForgeDirection.UP );
 	}
-	
+
 	public void onEntityCollidedWithBlock( World world, int x, int y, int z, Entity entity )
 	{
-		if ( entity == null )
+		if( entity == null )
 			return;
 		// Start movement of non item entities on transport belt
-		List list = world.getEntitiesWithinAABBExcludingEntity( ( Entity ) null, AxisAlignedBB.getBoundingBox( x, y, z, x + 1, y + .065, z + 1 ) );
-		if ( Math.round( entity.posX - 0.5 ) == x && Math.round( entity.posZ - 0.5 ) == z && list.contains( entity ) )
+		List list = world.getEntitiesWithinAABBExcludingEntity( (Entity) null, AxisAlignedBB.getBoundingBox( x, y, z, x + 1, y + .065, z + 1 ) );
+		if( Math.round( entity.posX - 0.5 ) == x && Math.round( entity.posZ - 0.5 ) == z && list.contains( entity ) )
 		{
-			if ( !( entity instanceof EntityItem ) )
+			if( !( entity instanceof EntityItem ) )
 			{
 				int metadata = world.getBlockMetadata( x, y, z );
-				switch ( metadata )
+				switch( metadata )
 				{
 					case 0:
 						entity.addVelocity( 0.0f, 0.0f, speed );
@@ -107,13 +108,13 @@ public class BlockBaseTransportBelt extends Block
 						break;
 				}
 			}
-			
+
 			// End movement of non items
-			
+
 			// Start conversion of EntityItem 's to EntityBeltItem
-			if ( !world.isRemote && entity instanceof EntityItem && !( entity instanceof EntityBeltItem ) )
+			if( !world.isRemote && entity instanceof EntityItem && !( entity instanceof EntityBeltItem ) )
 			{
-				EntityItem entityItem = ( EntityItem ) entity;
+				EntityItem entityItem = (EntityItem) entity;
 				EntityBeltItem item = new EntityBeltItem( entity.worldObj, entity.posX, entity.posY, entity.posZ, entityItem.getEntityItem() );
 				item.motionX = entity.motionX;
 				item.motionY = entity.motionY;
@@ -121,70 +122,74 @@ public class BlockBaseTransportBelt extends Block
 				world.spawnEntityInWorld( item );
 				entity.setDead();
 			}
-			
+
 			// End conversion of EntityItem
-			
+
 			// Start movement of EntityBeltItem 's
-			if ( entity instanceof EntityBeltItem )
+			if( entity instanceof EntityBeltItem )
 			{
-				EntityBeltItem item = ( EntityBeltItem ) entity;
+				EntityBeltItem item = (EntityBeltItem) entity;
 				item.resetBeltTimer();
 				{
 					int metadata = world.getBlockMetadata( x, y, z );
-					switch ( metadata )
+					switch( metadata )
 					{
 						case 0:
 							// item.addVelocity( 0.0f, 0.0f, speed );
-							if ( item.posX <= x + .5 )
+							if( item.posX <= x + .5 )
 							// && item.posX != x + .25 )
 							{
 								item.pathTo( x + .25, item.posY, z + 1.25, speed );
-							} else if ( item.posX > x + .5 )
+							}
+							else if( item.posX > x + .5 )
 							// && item.posX != x + .75 )
 							{
 								item.pathTo( x + .75, item.posY, z + 1.25, speed );
 							}
 							break;
-						
+
 						case 1:
 							// item.addVelocity( -speed, 0.0f, 0.0f );
-							if ( item.posZ <= z + .5 )
+							if( item.posZ <= z + .5 )
 							// && item.posZ != z + .25 )
 							{
 								item.pathTo( x - .25, item.posY, z + .25, speed );
-							} else if ( item.posZ > z + .5 )
+							}
+							else if( item.posZ > z + .5 )
 							// item.posZ != z + .75 )
 							{
 								item.pathTo( x - .25, item.posY, z + .75, speed );
 							}
 							break;
-						
+
 						case 2:
 							// item.addVelocity( 0.0f, 0.0f, -speed );
-							if ( item.posX <= x + .5 )
+							if( item.posX <= x + .5 )
 							// && item.posX != x + .25 )
 							{
 								item.pathTo( x + .25, item.posY, z - .25, speed );
-							} else if ( item.posX > x + .5 )
+							}
+							else if( item.posX > x + .5 )
 							// && item.posX != x + .75 )
 							{
 								item.pathTo( x + .75, item.posY, z - .25, speed );
 							}
 							break;
-						
+
 						case 3:
 							// item.addVelocity( speed, 0.0f, 0.0f );
-							if ( item.posZ <= z + .5 )
+							if( item.posZ <= z + .5 )
 							// && item.posZ != z + .25 )
 							{
 								item.pathTo( x + 1.25, item.posY, z + .25, speed );
-							} else if ( item.posZ > z + .5 )
+							}
+							else if( item.posZ > z + .5 )
 							// &&item.posZ != z + .75 )
 							{
 								item.pathTo( x + 1.25, item.posY, z + .75, speed );
 							}
 							break;
-						
+
 						default:
 							break;
 					}
@@ -192,23 +197,23 @@ public class BlockBaseTransportBelt extends Block
 			}
 		}
 	}
-	
+
 	public void onBlockPlacedBy( World world, int x, int y, int z, EntityLivingBase entity, ItemStack stack )
 	{
 		float yaw = entity.rotationYaw + 45;
-		while ( yaw >= 360 )
+		while( yaw >= 360 )
 			yaw -= 360;
-		while ( yaw < 0 )
+		while( yaw < 0 )
 			yaw += 360;
-		
-		if ( yaw < 90 )
+
+		if( yaw < 90 )
 			world.setBlockMetadataWithNotify( x, y, z, 0, 2 );
-		else if ( yaw < 180 )
+		else if( yaw < 180 )
 			world.setBlockMetadataWithNotify( x, y, z, 1, 2 );
-		else if ( yaw < 270 )
+		else if( yaw < 270 )
 			world.setBlockMetadataWithNotify( x, y, z, 2, 2 );
 		else
 			world.setBlockMetadataWithNotify( x, y, z, 3, 2 );
-		
+
 	}
 }
