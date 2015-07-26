@@ -59,17 +59,17 @@ public class TileEntityInserter extends TileEntity
 			prevDestX = destX;
 			prevDestY = destY;
 			prevDestZ = destZ;
-			if( prevDestX == 0 )
+			if( prevDestZ == -.5 )
 			{
-				destX = 1;
-				destY = 1;
-				destZ = 2;
+				destX = .5;
+				destY = .5;
+				destZ = 1.5;
 			}
-			else if( prevDestX == 1 )
+			else
 			{
-				destX = 0;
-				destY = 0;
-				destZ = 0;
+				destX = .5;
+				destY = .5;
+				destZ = -.5;
 			}
 			progress = 0;
 		}
