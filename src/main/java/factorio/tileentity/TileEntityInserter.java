@@ -12,14 +12,27 @@ import net.minecraft.world.World;
 
 public class TileEntityInserter extends TileEntity
 {
+	public double destX;
+	public double destZ;
+	public double destY;
+	public double prevDestX;
+	public double prevDestZ;
+	public double prevDestY;
 
-	int progress = 0;
+	public static int progressToComplete = 12;
+	public int progress = 0;
 
 	@Override
 	public void writeToNBT( NBTTagCompound par1 )
 	{
 		super.writeToNBT( par1 );
 		par1.setInteger( "progress", progress );
+		par1.setDouble( "destX", destX );
+		par1.setDouble( "destY", destY );
+		par1.setDouble( "destZ", destZ );
+		par1.setDouble( "prevDestX", prevDestX );
+		par1.setDouble( "prevDestY", prevDestY );
+		par1.setDouble( "prevDestZ", prevDestZ );
 	}
 
 	@Override
@@ -27,51 +40,38 @@ public class TileEntityInserter extends TileEntity
 	{
 		super.readFromNBT( par1 );
 		progress = par1.getInteger( "progress" );
+		destX = par1.getDouble( "destX" );
+		destY = par1.getDouble( "destY" );
+		destZ = par1.getDouble( "destZ" );
+		prevDestX = par1.getDouble( "prevDestX" );
+		prevDestY = par1.getDouble( "prevDestY" );
+		prevDestZ = par1.getDouble( "prevDestZ" );
 	}
 
 	@Override
 	public void updateEntity()
 	{
-		if( progress < 20 )
+		if( progress < progressToComplete )
 			++progress;
-		if( !this.worldObj.isRemote && progress >= 20 )
+		//if( !this.worldObj.isRemote && progress >= progressToComplete )
+		if( progress >= progressToComplete )
 		{
-			TileEntity tile = worldObj.getTileEntity( xCoord + 1, yCoord, zCoord );
-			if( tile != null && tile instanceof IInventory )
+			prevDestX = destX;
+			prevDestY = destY;
+			prevDestZ = destZ;
+			if( prevDestX == 0 )
 			{
-				IInventory tileInv = (IInventory) tile;
-				int i = tileInv.getSizeInventory();
-				int v = 0;
-				boolean flag = true;
-				ItemStack stack = null;
-				while( flag )
-				{
-					stack = tileInv.decrStackSize( v, 1 );
-					if( stack == null )
-					{
-						++v;
-						if( v == i )
-						{
-							flag = false;
-						}
-					}
-					else
-					{
-						flag = false;
-					}
-				}
-				if( stack != null )
-				{
-					EntityItem entityitem = new EntityItem( worldObj, ( (double) xCoord ) - .75, ( (double) yCoord ) + .5, ( (double) zCoord ) + .5, stack );
-					entityitem.motionX = 0;
-					entityitem.motionY = 0;
-					entityitem.motionZ = 0;
-					worldObj.spawnEntityInWorld( entityitem );
-					progress = 0;
-					//
-				}
+				destX = 1;
+				destY = 1;
+				destZ = 2;
 			}
-
+			else if( prevDestX == 1 )
+			{
+				destX = 0;
+				destY = 0;
+				destZ = 0;
+			}
+			progress = 0;
 		}
 		this.markDirty();
 	}
