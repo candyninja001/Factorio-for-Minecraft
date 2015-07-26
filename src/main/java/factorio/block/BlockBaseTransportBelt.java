@@ -48,6 +48,7 @@ public class BlockBaseTransportBelt extends Block
 		setLightOpacity( 0 );
 	}
 
+	@Override
 	public boolean isOpaqueCube()
 	{
 		return false;
@@ -65,20 +66,19 @@ public class BlockBaseTransportBelt extends Block
 		return RenderTransportBelt.renderID;
 	}
 
-	protected void checkAndDropBlock( World world, int x, int y, int z )
+	@Override
+	public boolean canPlaceBlockAt( World world, int x, int y, int z )
 	{
-		if( !this.canBlockStay( world, x, y, z ) )
-		{
-			this.dropBlockAsItem( world, x, y, z, world.getBlockMetadata( x, y, z ), 0 );
-			world.setBlock( x, y, z, getBlockById( 0 ), 0, 2 );
-		}
+		return world.getBlock( x, y - 1, z ).isSideSolid( world, x, y, z, ForgeDirection.UP );
 	}
 
+	@Override
 	public boolean canBlockStay( World world, int x, int y, int z )
 	{
 		return world.getBlock( x, y - 1, z ).isSideSolid( world, x, y, z, ForgeDirection.UP );
 	}
 
+	@Override
 	public void onEntityCollidedWithBlock( World world, int x, int y, int z, Entity entity )
 	{
 		if( entity == null )
@@ -198,6 +198,7 @@ public class BlockBaseTransportBelt extends Block
 		}
 	}
 
+	@Override
 	public void onBlockPlacedBy( World world, int x, int y, int z, EntityLivingBase entity, ItemStack stack )
 	{
 		float yaw = entity.rotationYaw + 45;
@@ -205,7 +206,6 @@ public class BlockBaseTransportBelt extends Block
 			yaw -= 360;
 		while( yaw < 0 )
 			yaw += 360;
-
 		if( yaw < 90 )
 			world.setBlockMetadataWithNotify( x, y, z, 0, 2 );
 		else if( yaw < 180 )
@@ -214,6 +214,5 @@ public class BlockBaseTransportBelt extends Block
 			world.setBlockMetadataWithNotify( x, y, z, 2, 2 );
 		else
 			world.setBlockMetadataWithNotify( x, y, z, 3, 2 );
-
 	}
 }
