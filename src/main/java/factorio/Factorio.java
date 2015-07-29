@@ -40,12 +40,10 @@ public class Factorio
 
 		TransportBelt = new BlockBaseTransportBelt( 0.04f );
 		GameRegistry.registerBlock( TransportBelt, MODID + "_" + TransportBelt.getUnlocalizedName().substring( 5 ) );
-		// GameRegistry.registerTileEntity( factorio.tileentity.TileEntityTransportBelt.class, "transportbelt" );
 		RenderingRegistry.registerBlockHandler( new RenderTransportBelt() );
 
 		EntityRegistry.registerGlobalEntityID( EntityBeltItem.class, "entityBeltItem", EntityRegistry.findGlobalUniqueEntityId() );
-		// EntityRegistry.registerModEntity( EntityBeltItem.class, "entitybeltitem", EntityRegistry.findGlobalUniqueEntityId(), this, 80, 3, true );
-
+		
 		proxy.registerRenderers();
 	}
 }
