@@ -2,12 +2,15 @@
 package factorio.tileentity;
 
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 
 
 public class TileEntityInserter extends TileEntity
@@ -54,25 +57,101 @@ public class TileEntityInserter extends TileEntity
 		if( progress < progressToComplete )
 			++progress;
 		//if( !this.worldObj.isRemote && progress >= progressToComplete )
-		if( progress >= progressToComplete )
+		if (false)//if( progress >= progressToComplete )
 		{
-			prevDestX = destX;
-			prevDestY = destY;
-			prevDestZ = destZ;
-			if( prevDestZ == -.5 )
+			boolean flag = false;
+			if( destZ == 1.5 )
 			{
-				destX = .5;
-				destY = .5;
-				destZ = 1.5;
+				switch( blockMetadata )
+				{
+					case 0:
+						flag = pullOrPushItemTo( xCoord, yCoord, zCoord + 1 );
+						break;
+					case 1:
+						flag = pullOrPushItemTo( xCoord - 1, yCoord, zCoord );
+						break;
+					case 2:
+						flag = pullOrPushItemTo( xCoord, yCoord, zCoord - 1 );
+						break;
+					case 3:
+						flag = pullOrPushItemTo( xCoord + 1, yCoord, zCoord );
+						break;
+					default:
+						break;
+				}
+			}
+			else if( destZ == -0.5 )
+			{
+				switch( blockMetadata )
+				{
+					case 0:
+						flag = pullOrPushItemTo( xCoord, yCoord, zCoord - 1 );
+						break;
+					case 1:
+						flag = pullOrPushItemTo( xCoord + 1, yCoord, zCoord );
+						break;
+					case 2:
+						flag = pullOrPushItemTo( xCoord, yCoord, zCoord + 1 );
+						break;
+					case 3:
+						flag = pullOrPushItemTo( xCoord - 1, yCoord, zCoord );
+						break;
+					default:
+						break;
+				}
+			}
+			if( flag )
+			{
+				switchDest();
+				this.worldObj.markBlockForUpdate( xCoord, yCoord, zCoord );
+				progress = 0;
+				this.markDirty();
+			}
+		}
+	}
+
+	private boolean pullOrPushItemTo( int xCoord, int yCoord, int zCoord , ForgeDirection direction)
+	{
+		TileEntity tileEntity = worldObj.getTileEntity( xCoord, yCoord, zCoord );
+		if( tileEntity == null )
+		{
+			if( worldObj.isAirBlock( xCoord, yCoord, zCoord ) )
+			{
+				return true;
 			}
 			else
 			{
-				destX = .5;
-				destY = .5;
-				destZ = -.5;
+				return false;
 			}
-			progress = 0;
 		}
-		this.markDirty();
+		else if( tileEntity instanceof IInventory )
+		{
+			if (tileEntity instanceof ISidedInventory){
+				IInventory iInventory = (IInventory) tileEntity;
+			}else{
+				ISidedInventory iSidedInventory = (ISidedInventory) tileEntity;
+				int[] slots = iSidedInventory.getAccessibleSlotsFromSide( ForgeDirection. );
+			}
+		}
+		return false;
+	}
+
+	public void switchDest()
+	{
+		prevDestX = destX;
+		prevDestY = destY;
+		prevDestZ = destZ;
+		if( prevDestZ == -.5 )
+		{
+			destX = .5;
+			destY = .5;
+			destZ = 1.5;
+		}
+		else
+		{
+			destX = .5;
+			destY = .5;
+			destZ = -.5;
+		}
 	}
 }
